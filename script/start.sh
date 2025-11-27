@@ -1,6 +1,6 @@
 ###
  # @Author: cy
- # @Email: 964028708@qq.com
+ # @Email: patrickcchan@163.com
  # @Date: 2025-04-26 15:49:45
  # @LastEditTime: 2025-04-26 16:20:32
  # @FilePath: /cy_frame/script/start.sh

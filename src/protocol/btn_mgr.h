@@ -1,6 +1,6 @@
 /*
  * @Author: cy
- * @Email: 964028708@qq.com
+ * @Email: patrickcchan@163.com
  * @Date: 2024-06-12 14:49:06
  * @LastEditTime: 2025-01-19 16:43:44
  * @FilePath: /cy_frame/src/protocol/btn_mgr.h

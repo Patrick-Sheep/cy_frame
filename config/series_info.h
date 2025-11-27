@@ -1,6 +1,6 @@
 /*
  * @Author: cy
- * @Email: 964028708@qq.com
+ * @Email: patrickcchan@163.com
  * @Date: 2025-01-18 11:33:02
  * @LastEditTime: 2025-11-27 03:41:04
  * @FilePath: /cy_frame/config/series_info.h

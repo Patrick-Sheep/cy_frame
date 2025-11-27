@@ -1,6 +1,6 @@
 /*
  * @Author: cy
- * @Email: 964028708@qq.com
+ * @Email: patrickcchan@163.com
  * @Date: 2024-06-20 15:14:05
  * @LastEditTime: 2025-01-19 16:43:53
  * @FilePath: /kaidu_tr_pro/src/protocol/tuya_mgr.h

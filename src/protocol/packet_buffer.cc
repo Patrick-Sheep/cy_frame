@@ -1,6 +1,6 @@
 /*
  * @Author: cy
- * @Email: 964028708@qq.com
+ * @Email: patrickcchan@163.com
  * @Date: 2025-01-18 11:31:51
  * @LastEditTime: 2025-02-05 10:52:14
  * @FilePath: /cy_frame/src/protocol/packet_buffer.cc

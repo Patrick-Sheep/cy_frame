@@ -1,6 +1,6 @@
 ###
  # @Author: cy
- # @Email: 964028708@qq.com
+ # @Email: patrickcchan@163.com
  # @Date: 2024-07-11 14:18:06
  # @LastEditTime: 2025-11-27 11:41:57
  # @FilePath: /cy_frame/script/device/pull.sh

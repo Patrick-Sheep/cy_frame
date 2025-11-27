@@ -1,6 +1,6 @@
 /*
  * @Author: cy
- * @Email: 964028708@qq.com
+ * @Email: patrickcchan@163.com
  * @Date: 2024-05-22 15:47:17
  * @LastEditTime: 2025-01-17 01:19:15
  * @FilePath: /cy_frame/src/function/this_func.h

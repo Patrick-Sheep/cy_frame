@@ -1,6 +1,6 @@
 ##
  # @Author: cy
- # @Email: 964028708@qq.com
+ # @Email: patrickcchan@163.com
  # @Date: 2025-04-26 14:33:55
  # @LastEditTime: 2025-04-26 14:49:58
  # @FilePath: /cy_frame/script/upgrade.sh

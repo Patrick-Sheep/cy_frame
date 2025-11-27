@@ -1,6 +1,6 @@
 /*
  * @Author: cy
- * @Email: 964028708@qq.com
+ * @Email: patrickcchan@163.com
  * @Date: 2024-08-01 03:03:02
  * @LastEditTime: 2025-11-27 11:44:16
  * @FilePath: /cy_frame/src/protocol/tuya_mgr.cc

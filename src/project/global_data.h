@@ -1,6 +1,6 @@
 /*
  * @Author: cy
- * @Email: 964028708@qq.com
+ * @Email: patrickcchan@163.com
  * @Date: 2024-05-22 15:53:50
  * @LastEditTime: 2025-11-27 11:44:12
  * @FilePath: /cy_frame/src/project/global_data.h

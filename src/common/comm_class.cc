@@ -1,6 +1,6 @@
  /*
  * @Author: cy
- * @Email: 964028708@qq.com
+ * @Email: patrickcchan@163.com
  * @Date: 2025-04-30 11:12:00
  * @LastEditTime: 2025-09-01 14:31:15
  * @FilePath: /kk_frame/src/common/comm_class.cc

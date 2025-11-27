@@ -1,7 +1,7 @@
 #!/bin/sh
 ###
  # @Author: cy
- # @Email: 964028708@qq.com
+ # @Email: patrickcchan@163.com
  # @Date: 2024-06-05 02:05:58
  # @LastEditTime: 2025-11-27 11:41:45
  # @FilePath: /cy_frame/script/device/env.sh

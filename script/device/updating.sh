@@ -1,10 +1,10 @@
 #!/bin/sh
 ###
  # @Author: cy
- # @Email: 964028708@qq.com
+ # @Email: patrickcchan@163.com
  # @Date: 2024-05-22 15:42:58
- # @LastEditTime: 2025-04-26 15:26:47
- # @FilePath: /cy_frame/script/updating.sh
+ # @LastEditTime: 2025-11-27 11:50:40
+ # @FilePath: /cy_frame/script/device/updating.sh
  # @Description: 
  # @BugList: 
  # 

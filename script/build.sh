@@ -3,7 +3,7 @@
 
 ###
  # @Author: cy
- # @Email: 964028708@qq.com
+ # @Email: patrickcchan@163.com
  # @Date: 2024-05-22 15:42:58
  # @LastEditTime: 2025-11-27 11:41:53
  # @FilePath: /cy_frame/script/build.sh

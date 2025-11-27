@@ -1,6 +1,6 @@
 /*
  * @Author: cy
- * @Email: 964028708@qq.com
+ * @Email: patrickcchan@163.com
  * @Date: 2024-05-22 15:55:07
  * @LastEditTime: 2025-11-27 11:44:31
  * @FilePath: /cy_frame/src/viewlibs/rkLayoutManage.h

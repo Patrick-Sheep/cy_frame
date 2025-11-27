@@ -1,6 +1,6 @@
 /*
  * @Author: cy
- * @Email: 964028708@qq.com
+ * @Email: patrickcchan@163.com
  * @Date: 2024-05-23 00:04:23
  * @LastEditTime: 2025-11-27 11:45:47
  * @FilePath: /cy_frame/src/windows/pop_tip.h

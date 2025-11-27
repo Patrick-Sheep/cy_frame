@@ -1,6 +1,6 @@
 /*
  * @Author: cy
- * @Email: 964028708@qq.com
+ * @Email: patrickcchan@163.com
  * @Date: 2024-12-16 09:51:02
  * @LastEditTime: 2024-12-16 10:17:14
  * @FilePath: /cy_frame/src/function/tuya_func.cc

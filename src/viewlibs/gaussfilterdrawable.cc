@@ -7,7 +7,6 @@
 
 #define USER_NENO 1
 #include <pixman.h>
-#endif
 
 GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,int scale,float colorDev, int noiseMin, int noiseMax):mGaussRadius(ksize){
     mGaussRegion.setEmpty();

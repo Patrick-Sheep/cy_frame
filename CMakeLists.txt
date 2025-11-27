@@ -15,7 +15,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(jsoncpp CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
-# find_package(Pixman)
+find_package(Pixman)
 
 # 源文件收集 [./*.c和./*.cc]会意外导致匹配到非src目录下的源文件
 file(GLOB_RECURSE PROJECT_SOURCES
@@ -62,7 +62,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_BINARY_DIR}/include/porting
 
     # PIXMAN头文件
-    # ${PIXMAN_INCLUDE_DIRS}
+    ${PIXMAN_INCLUDE_DIRS}
 )
 
 # 公共编译定义
@@ -102,7 +102,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 # endif()
 
 # Gauss相关的库
-find_package(Pixman)
+# find_package(Pixman)
 if(CDROID_CHIPSET STREQUAL sigma)
     find_package(OpenMP REQUIRED)
     if(OpenMP_C_FOUND)
@@ -113,6 +113,8 @@ else()
     include_directories(./3rdpart/ARM_NEON_2_x86_SSE)
     set(AVX_SSE -mavx -msse)
 endif()
+
+target_compile_options(${PROJECT_NAME} PRIVATE ${AVX_SSE})
 
 # 增加 3rdpart 的CMAKE 
 add_subdirectory(./3rdpart)

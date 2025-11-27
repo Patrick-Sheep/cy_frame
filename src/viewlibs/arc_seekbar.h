@@ -7,9 +7,9 @@
 #ifndef __arc_seekbar_h__
 #define __arc_seekbar_h__
 
-#include "libs.h"
 #include <view/view.h>
-
+#include <widget/seekbar.h>
+#include "paint.h"
 #define ARC_MULTIPLE 10
 
 class ArcSeekBar : public View {

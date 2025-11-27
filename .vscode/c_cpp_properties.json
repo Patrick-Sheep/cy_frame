@@ -5,10 +5,10 @@
             "includePath": [
                 "${workspaceFolder}/*",
                 "${workspaceFolder}/**",
-                "~/cdroid/src/*",
-                "~/cdroid/src/**",
+                "~/Cdroid/src/*",
+                "~/Cdroid/src/**",
                 "~/vcpkg/packages/**",
-                "~/cdroid/outX64-Debug/src/gui/*"
+                "~/Cdroid/outX64-Debug/src/gui/*"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

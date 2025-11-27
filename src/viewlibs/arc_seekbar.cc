@@ -1,5 +1,11 @@
 ﻿#include "arc_seekbar.h"
 #include <core/pools.h>
+
+#ifdef MAX
+#undef MAX
+#endif
+#define MAX(a, b)             (((a)>(b)) ? (a) : (b))
+
 DECLARE_WIDGET(ArcSeekBar)
 
 double ArcSeekBar::ARC_EXTEND_ANGLE = 10.0;
@@ -7,12 +13,12 @@ double ArcSeekBar::ARC_EXTEND_ANGLE = 10.0;
 class VISUAL_ARC_PROGRESS:public Property{
 public:
     VISUAL_ARC_PROGRESS():Property("visual_arc_progress"){}
-    void set(void*object,const AnimateValue&value)override {
+    void set(void*object,const AnimateValue&value)const override {
         float fv = GET_VARIANT(value,float);
         ((ArcSeekBar*)object)->setVisualProgress(fv);
         ((ArcSeekBar*)object)->mVisualProgress = fv;
     }
-    AnimateValue get(void*object) override{
+    AnimateValue get(void*object)const override {
         return ((ArcSeekBar*)object)->mVisualProgress;
     }
 };
@@ -470,7 +476,7 @@ void ArcSeekBar::doRefreshProgress(float progress, bool fromUser, bool animate){
         ObjectAnimator* animator = ObjectAnimator::ofFloat(this,"visual_arc_progress",{progress});
         animator->setAutoCancel(true);
         animator->setDuration(PROGRESS_ANIM_DURATION);
-        animator->setInterpolator(DecelerateInterpolator::gDecelerateInterpolator.get());
+        animator->setInterpolator(DecelerateInterpolator::Instance);
         AnimatorListenerAdapter animtorListener;
         animtorListener.onAnimationEnd=[this](Animator&anim,bool){
             delete mLastProgressAnimator;

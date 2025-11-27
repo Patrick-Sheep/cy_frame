@@ -4,7 +4,7 @@
  # @Email: me@ricken.cn
  # @Date: 2025-05-03 21:10:04
  # @LastEditTime: 2025-05-03 21:10:29
- # @FilePath: /kk_frame/script/mount.sh
+ # @FilePath: /cy_frame/script/mount.sh
  # @Description: 
  # @BugList: 
  # 

@@ -4,7 +4,7 @@ Author: Ricken
 Email: me@ricken.cn
 Date: 2025-10-27 09:42:38
 LastEditTime: 2025-10-27 10:21:34
-FilePath: /kk_frame/script/fill_bg.py
+FilePath: /cy_frame/script/fill_bg.py
 Description: fill_bg.py - 为 PNG 批量填充底色、去透明、去元数据，输出最小化图像文件。
 BugList: 
 

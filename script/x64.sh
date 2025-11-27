@@ -3,7 +3,7 @@
  # @Email: me@ricken.cn
  # @Date: 2025-05-03 21:12:10
  # @LastEditTime: 2025-05-28 13:20:03
- # @FilePath: /kk_frame/script/x64.sh
+ # @FilePath: /cy_frame/script/x64.sh
  # @Description: 
  # @BugList: 
  # 
@@ -15,7 +15,7 @@
 #set -x
 
 # 参数定义
-NAME=kk_frame
+NAME=cy_frame
 CDROID_DIR=~/cdroid
 OUTX64_DIR=./outX64-Debug
 RUN_CMD=./apps/$NAME/$NAME

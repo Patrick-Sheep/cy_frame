@@ -2,7 +2,7 @@
  * @Author: cy
  * @Email: patrickcchan@163.com
  * @Date: 2024-05-22 15:47:17
- * @LastEditTime: 2025-04-25 14:33:34
+ * @LastEditTime: 2025-11-27 13:48:04
  * @FilePath: /cy_frame/src/function/this_func.cc
  * @Description: 此项目的一些功能函数
  * @BugList:
@@ -102,7 +102,7 @@ void analogInput(int code, int value) {
 
 void refreshScreenSaver() {
 #if 1
-    SENDKEY(cdroid::KEY_EISU, 2);
+    SENDKEY(cdroid::AKEYCODE_EISU, 2);
 #else
     cdroid::InputEventSource::getInstance().closeScreenSaver();
 #endif

@@ -3,7 +3,7 @@
  * @Email: me@ricken.cn
  * @Date: 2025-11-24 05:46:03
  * @LastEditTime: 2025-11-26 18:51:10
- * @FilePath: /kk_frame/src/windows/msg.h
+ * @FilePath: /cy_frame/src/windows/msg.h
  * @Description: 消息类（初始化消息、运行时消息、）
  * @BugList:
  *

@@ -3,7 +3,7 @@
  * @Email: me@ricken.cn
  * @Date: 2024-05-23 00:04:23
  * @LastEditTime: 2025-11-26 10:46:21
- * @FilePath: /kk_frame/src/windows/page_home.h
+ * @FilePath: /cy_frame/src/windows/page_home.h
  * @Description: 主页面
  * @BugList:
  *

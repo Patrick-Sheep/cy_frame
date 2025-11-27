@@ -2,8 +2,8 @@
 Author: Ricken
 Email: me@ricken.cn
 Date: 2025-04-25 12:52:59
-LastEditTime: 2025-05-29 11:26:38
-FilePath: /kk_frame/build.py
+LastEditTime: 2025-11-27 11:59:16
+FilePath: /cy_frame/build.py
 Description: 项目构建脚本
 BugList: 
 
@@ -40,7 +40,7 @@ def get_template_parent_commit_id():
         print(f"\n获取Git提交ID时出错: {str(e)}")
         return '未知'
 
-# 替换源文件中所有文件的 'kk_frame' ID为项目名称
+# 替换源文件中所有文件的 'cy_frame' ID为项目名称
 def replace_id_in_source_files(new_project_name, directories):
     total_files = 0
     total_replacements = 0
@@ -68,15 +68,15 @@ def replace_id_in_source_files(new_project_name, directories):
                             content = f.read()
                         
                         # 检查是否需要替换（排除顶部注释）
-                        if 'kk_frame' in content:
-                            # 第一步：将 "kk_frame/" 替换为临时标记 "kk__frame/"
-                            temp_content = content.replace('kk_frame/', 'kk__frame/')
+                        if 'cy_frame' in content:
+                            # 第一步：将 "cy_frame/" 替换为临时标记 "kk__frame/"
+                            temp_content = content.replace('cy_frame/', 'kk__frame/')
                             
-                            # 第二步：将剩余的 "kk_frame" 替换为新项目名称
-                            new_content = temp_content.replace('kk_frame', new_project_name)
+                            # 第二步：将剩余的 "cy_frame" 替换为新项目名称
+                            new_content = temp_content.replace('cy_frame', new_project_name)
                             
-                            # 第三步：将临时标记 "kk__frame" 恢复为 "kk_frame"
-                            final_content = new_content.replace('kk__frame', 'kk_frame')
+                            # 第三步：将临时标记 "kk__frame" 恢复为 "cy_frame"
+                            final_content = new_content.replace('kk__frame', 'cy_frame')
                             
                             # 只有在内容发生变化时才写回文件
                             if final_content != content:
@@ -144,7 +144,7 @@ def replace_project_name_in_cmake(new_project_name):
         content = file.read()
 
     # 替换指定文本
-    updated_content = content.replace('kk_frame', new_project_name)
+    updated_content = content.replace('cy_frame', new_project_name)
 
     # 将修改后的内容写回文件
     with open(cmake_file_path, 'w', encoding='utf-8') as file:

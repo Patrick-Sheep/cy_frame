@@ -3,7 +3,7 @@
  * @Email: me@ricken.cn
  * @Date: 2024-05-22 15:55:35
  * @LastEditTime: 2025-11-27 09:23:13
- * @FilePath: /kk_frame/src/windows/wind_mgr.cc
+ * @FilePath: /cy_frame/src/windows/wind_mgr.cc
  * @Description: 页面管理类
  * @BugList:
  *

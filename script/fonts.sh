@@ -3,7 +3,7 @@
  # @Email: me@ricken.cn
  # @Date: 2025-08-10 14:58:10
  # @LastEditTime: 2025-08-10 15:26:18
- # @FilePath: /kk_frame/script/fonts.sh
+ # @FilePath: /cy_frame/script/fonts.sh
  # @Description: 生成fontconfig配置文件，便于X64查看效果
  # @BugList: 
  # 

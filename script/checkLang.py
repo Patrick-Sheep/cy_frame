@@ -3,7 +3,7 @@ Author: Ricken
 Email: me@ricken.cn
 Date: 2025-08-12 07:18:24
 LastEditTime: 2025-08-12 07:18:46
-FilePath: /kk_frame/script/checkLang.py
+FilePath: /cy_frame/script/checkLang.py
 Description: 检查目录下所有json文件的键及其对应的列表数量是否一致
 BugList: 
 

@@ -11,7 +11,7 @@
  # 
 ### 
 
-NAME=kk_frame
+NAME=cy_frame
 SPEED=38400
 
 APP_DIR=/customer/app

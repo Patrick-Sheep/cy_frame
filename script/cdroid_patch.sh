@@ -4,7 +4,7 @@
  # @Email: me@ricken.cn
  # @Date: 2025-07-10 23:44:31
  # @LastEditTime: 2025-07-11 00:44:25
- # @FilePath: /kk_frame/script/cdroid_patch.sh
+ # @FilePath: /cy_frame/script/cdroid_patch.sh
  # @Description: 生成Cdroid修改部分的补丁
  # @BugList: 
  # 

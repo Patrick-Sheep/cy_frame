@@ -88,12 +88,12 @@ void BaseWindow::init() {
     if (
         !(mRootView = (ViewGroup*)(LayoutInflater::from(mContext)->inflate("@layout/wind_base", this))) ||
 
-        !(mPageBox = __getgv(mRootView, ViewGroup, kk_frame::R::id::main_box)) ||
-        !(mPopBox = __getgv(mRootView, ViewGroup, kk_frame::R::id::pop_box)) ||
-        !(mLogoForImage = __getgv(mRootView, ImageView, kk_frame::R::id::logo)) ||
-        !(mLogoForVideo = __getgv(mRootView, VideoView, kk_frame::R::id::logo_video)) ||
-        !(mToast = __getgv(mRootView, TextView, kk_frame::R::id::toast)) ||
-        !(mBlackView = __getgv(mRootView, View, kk_frame::R::id::cover))
+        !(mPageBox = __getgv(mRootView, ViewGroup, cy_frame::R::id::main_box)) ||
+        !(mPopBox = __getgv(mRootView, ViewGroup, cy_frame::R::id::pop_box)) ||
+        !(mLogoForImage = __getgv(mRootView, ImageView, cy_frame::R::id::logo)) ||
+        !(mLogoForVideo = __getgv(mRootView, VideoView, cy_frame::R::id::logo_video)) ||
+        !(mToast = __getgv(mRootView, TextView, cy_frame::R::id::toast)) ||
+        !(mBlackView = __getgv(mRootView, View, cy_frame::R::id::cover))
         ) {
         throw std::runtime_error("BaseWindow View Tree Error");
     }
@@ -238,7 +238,7 @@ bool BaseWindow::onKeyDown(int keyCode, KeyEvent& evt) {
 /// @return 是否需要响铃
 bool BaseWindow::onKey(uint16_t keyCode, uint8_t status) {
     mLastAction = SystemClock::uptimeMillis();
-    if (keyCode == KEY_WINDOW)return false;  // 刷新mLastAction用
+    if (keyCode == AKEYCODE_WINDOW)return false;  // 刷新mLastAction用
     if (mIsShowLogo) return false;
     if (mIsBlackView) {
         if (status != VIRT_EVENT_DOWN)return false;
@@ -296,7 +296,7 @@ bool BaseWindow::showBlack(bool upload) {
 void BaseWindow::hideBlack() {
     if (!mIsBlackView)return;
     g_windMgr->showPage(PAGE_HOME);
-    mPage->callKey(KEY_WINDOW, VIRT_EVENT_UP);
+    mPage->callKey(AKEYCODE_WINDOW, VIRT_EVENT_UP);
     mBlackView->setVisibility(GONE);
     mIsBlackView = false;
     setBrightness(g_config->getBrightness());

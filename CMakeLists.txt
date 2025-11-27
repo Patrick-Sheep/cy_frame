@@ -1,6 +1,6 @@
 # cmake最低版本以及项目名设置
 cmake_minimum_required(VERSION 3.8)
-project(kk_frame)
+project(cy_frame)
 message("PROJECT_NAME=${PROJECT_NAME}")
 
 # 生成X64下的字体文件位置

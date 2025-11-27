@@ -5,7 +5,7 @@
 
 ### 备注
 - `fonts.sh`：编译时自动生成字体相关文件。
-- `kk_frame.ps1`：用于在Windows系统下创建AS项目软链到服务器。
+- `cy_frame.ps1`：用于在Windows系统下创建AS项目软链到服务器。
 - `ota.py`：用于给OTA包插入MD5信息头。
 - `x64.sh`：x64环境下的一些操作集合。
 - `build.sh`：用于构建升级文件。

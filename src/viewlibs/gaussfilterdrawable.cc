@@ -6,8 +6,6 @@
 #include "gaussianblur.h"
 
 #define USER_NENO 1
-#define USE_PIXMAN 1
-#ifdef USE_PIXMAN
 #include <pixman.h>
 #endif
 
@@ -153,8 +151,6 @@ void GaussFilterDrawable::computeBitmapGasuss(){
     bitmapRGBGaussData = (unsigned char *)malloc(mGaussWidth*mGaussHeight*4);
 #endif
 
-#if defined(USE_PIXMAN) && (USE_PIXMAN)
-
     // 创建一个 Pixman 图像表面(源数据的image)
     pixman_image_t* srcImage = pixman_image_create_bits(PIXMAN_a8r8g8b8, mBitmap->get_width(), mBitmap->get_height(), (uint32_t *)mBitmapData, mBitmap->get_width() * 4);
 
@@ -228,81 +224,6 @@ void GaussFilterDrawable::computeBitmapGasuss(){
     free(bitmapRGBGaussData);
 #endif
     LOGI("diff Time = %ld",SystemClock::uptimeMillis()-startTime);
-#else //!USE_PIXMAN
-    // 不使用PixMan，且gaussianFilter_u8_Neon当时只支持RGB的数据格式
-    // 因此把RGBA的数据，转换成RGB，再进行模糊计算，再添加杂色，
-    // 比较早的版本，不建议使用，仅留个记录
-    for(int i=0; i<mGaussHeight; i++){
-        for(int j=0; j<mGaussWidth; j++){
-            bitmapPos = (i*mScale+mGaussRegion.top)*mBitmap->get_width()+(j*mScale+mGaussRegion.left);
-            gaussPos = i*mGaussWidth+j;
-            bitmapRGBData[gaussPos*3+0] = mBitmapData[bitmapPos*4+0];
-            bitmapRGBData[gaussPos*3+1] = mBitmapData[bitmapPos*4+1];
-            bitmapRGBData[gaussPos*3+2] = mBitmapData[bitmapPos*4+2];
-        }
-    }
-
-    int64_t startTime2 = SystemClock::uptimeMillis();
-    LOGV("start Time2 = %lld",startTime2);
-    LOGI("diff Time = %ld",SystemClock::uptimeMillis()-startTime);
-
-    gaussianFilter_u8_Neon(bitmapRGBData, bitmapRGBGaussData, mGaussHeight , mGaussWidth, 3, mGaussRadius);
-
-    LOGI("gaussianFilter_u8_Neon time = %ld",SystemClock::uptimeMillis()-startTime2);
-    int64_t startTime3 = SystemClock::uptimeMillis();
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    // 定义生成随机数的范围(修改范围，从而实现不同的杂色效果，（-2，2）效果也还可以，目前颗粒感较重，水波纹基本去掉)
-    std::uniform_int_distribution<int> distribution(mColorNoiseMin, mColorNoiseMax);
-    // 将模糊后的数据，覆盖到原来图片中，并添加杂色
-    LOGI("mColorDev = %f",mColorDev);
-    for(int i=0; i<mGaussHeight; i++){
-        for(int j=0; j<mGaussWidth; j++){
-            bitmapPos = (i*mScale+mGaussRegion.top)*mBitmap->get_width()+(j*mScale+mGaussRegion.left);
-            gaussPos = i*mGaussWidth+j;
-            int colorNoise = distribution(gen);
-            // *mColorDev 将模糊区域变暗
-            int r = bitmapRGBGaussData[gaussPos*3+0]*mColorDev+colorNoise;
-            int g = bitmapRGBGaussData[gaussPos*3+1]*mColorDev+colorNoise;
-            int b = bitmapRGBGaussData[gaussPos*3+2]*mColorDev+colorNoise;
-
-            r = r>255?255:(r<0?0:r);
-            g = g>255?255:(g<0?0:g);
-            b = b>255?255:(b<0?0:b);
-
-            LOGI("gaussPos = %d   (%d,%d,%d)",gaussPos,r,g,b);
-
-            mBitmapData[bitmapPos*4+0] = r;
-            mBitmapData[bitmapPos*4+1] = g;
-            mBitmapData[bitmapPos*4+2] = b;
-
-            if((i*mScale+mGaussRegion.top+1) < mBitmap->get_height()){
-                mBitmapData[(mBitmap->get_width()+bitmapPos)*4+0] = r;
-                mBitmapData[(mBitmap->get_width()+bitmapPos)*4+1] = g;
-                mBitmapData[(mBitmap->get_width()+bitmapPos)*4+2] = b;
-            }
-
-            if((j*mScale+mGaussRegion.left+1) < mBitmap->get_width()){
-                mBitmapData[(1+bitmapPos)*4+0] = r;
-                mBitmapData[(1+bitmapPos)*4+1] = g;
-                mBitmapData[(1+bitmapPos)*4+2] = b;
-            }
-
-            if((i*mScale+mGaussRegion.top+1) < mBitmap->get_height() && (j*mScale+mGaussRegion.left+1) < mBitmap->get_width()){
-                mBitmapData[(1+mBitmap->get_width()+bitmapPos)*4+0] = r;
-                mBitmapData[(1+mBitmap->get_width()+bitmapPos)*4+1] = g;
-                mBitmapData[(1+mBitmap->get_width()+bitmapPos)*4+2] = b;
-            }
-        }
-    }
-    LOGI("diff Time = %ld",SystemClock::uptimeMillis()-startTime3);
-    free(bitmapRGBData);
-    free(bitmapRGBGaussData);
-    LOGI("diff Time = %ld",SystemClock::uptimeMillis()-startTime);
-    // mGaissBitmap->write_to_png("gaussBg.png"); // 检查模糊区域是否正确
-    // mBitmap->write_to_png("gaussBg.png");      // 检查模糊区域是否正确（原图+模糊区域）
-#endif //USE_PIXMAN
-    
 }   
 
 void GaussFilterDrawable::draw(Canvas&canvas){

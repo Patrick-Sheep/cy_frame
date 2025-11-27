@@ -12,7 +12,7 @@
  # 
 ### 
 
-NAME=kk_frame
+NAME=cy_frame
 RUN_DIR=/customer/app
 
 cd $RUN_DIR

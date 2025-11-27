@@ -1,5 +1,5 @@
 ## 项目名
-kk_frame
+cy_frame
 
 ## 信息
 Ricken 的 cdroid 项目模板

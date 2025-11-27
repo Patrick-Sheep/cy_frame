@@ -3,7 +3,7 @@
  * @Email: patrickcchan@163.com
  * @Date: 2025-04-30 11:12:00
  * @LastEditTime: 2025-09-01 14:31:15
- * @FilePath: /kk_frame/src/common/comm_class.cc
+ * @FilePath: /cy_frame/src/common/comm_class.cc
  * @Description: 公用类
  * @BugList: 
  * 

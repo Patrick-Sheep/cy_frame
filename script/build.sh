@@ -5,7 +5,7 @@
  # @Author: cy
  # @Email: patrickcchan@163.com
  # @Date: 2024-05-22 15:42:58
- # @LastEditTime: 2025-11-27 11:41:53
+ # @LastEditTime: 2025-11-27 12:00:12
  # @FilePath: /cy_frame/script/build.sh
  # @Description: 
  # @BugList: 
@@ -18,7 +18,7 @@
 cd $(dirname $0)
 
 # 项目参数
-NAME=kk_frame
+NAME=cy_frame
 DIRNAME=$NAME
 
 # 编译参数

@@ -1,7 +1,7 @@
 ﻿# @Author: Ricken
 # @Email: me@ricken.cn
 # @Date: 2025-05-29 09:18:36
-# @FilePath: /kk_frame/script/kk_frame.ps1
+# @FilePath: /cy_frame/script/cy_frame.ps1
 # @Description: 
 # @BugList: 
 #
@@ -30,7 +30,7 @@
 # 目标网络配置
 $targetIP = "10.0.0.88"                 # 服务器IP地址
 $targetShare = "ricken"                 # 共享名称
-$targetSubPath = "cdroid\apps\kk_frame" # 共享内子路径
+$targetSubPath = "cdroid\apps\cy_frame" # 共享内子路径
 $targetUser = "user"                    # 网络凭据用户名
 $targetPass = "pass"                    # 网络凭据密码
 
@@ -48,7 +48,7 @@ $enableOverwrite = $true
 ##############################################################
 
 # 设置窗口标题
-$host.UI.RawUI.WindowTitle = "KK_Frame 符号链接工具"
+$host.UI.RawUI.WindowTitle = "KK 符号链接工具"
 
 # 检测是否通过UAC提权启动
 $isElevatedByScript = $false
@@ -81,7 +81,7 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 }
 
 # 开启日志记录
-$logPath = Join-Path -Path $PSScriptRoot -ChildPath "kk_frame.log"
+$logPath = Join-Path -Path $PSScriptRoot -ChildPath "cy_frame.log"
 Start-Transcript -Path $logPath -Append | Out-Null
 Write-Host "`n===== 脚本开始执行 [$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] =====" -ForegroundColor Cyan
 

@@ -3,7 +3,7 @@
  * @Email: me@ricken.cn
  * @Date: 2025-08-29 16:14:15
  * @LastEditTime: 2025-09-01 16:55:57
- * @FilePath: /kk_frame/src/common/comm_class.h
+ * @FilePath: /cy_frame/src/common/comm_class.h
  * @Description: 公用类
  * @BugList:
  *

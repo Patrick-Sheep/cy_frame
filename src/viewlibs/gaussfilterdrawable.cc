@@ -8,7 +8,7 @@
 #define USER_NENO 1
 #include <pixman.h>
 
-GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,int scale,float colorDev, int noiseMin, int noiseMax):mGaussRadius(ksize){
+GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,double scale,float colorDev, int noiseMin, int noiseMax):mGaussRadius(ksize){
     mGaussRegion.setEmpty();
     bitmapRGBData = nullptr;
     bitmapRGBGaussData = nullptr;
@@ -20,10 +20,6 @@ GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,int 
     mPaddingLeft    = mPaddingTop    = 0;
     mPaddingRight   = mPaddingBottom = 0;
 
-    mColorDev       = colorDev;
-    mColorNoiseMin  = noiseMin;
-    mColorNoiseMax  = noiseMax;
-
     mScale = scale;
     mFromView = fromView;
     setGaussBitmip(mFromView,rect);
@@ -31,7 +27,7 @@ GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,int 
     computeBitmapGasuss();
 }
 
-GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,int scale,int maskColor, bool isGauss):mGaussRadius(ksize){
+GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,double scale,int maskColor, bool isGauss):mGaussRadius(ksize){
     mGaussRegion.setEmpty();
     bitmapRGBData = nullptr;
     bitmapRGBGaussData = nullptr;
@@ -47,7 +43,6 @@ GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,int 
 
     mScale = scale;
     mFromView = fromView;
-    setGaussColorNoiseRange(-2,2);
     setGaussBitmip(mFromView,rect);
 
     if(isGauss) computeBitmapGasuss();
@@ -62,7 +57,6 @@ void GaussFilterDrawable::setGaussBitmip(Cairo::RefPtr<Cairo::ImageSurface> &bmp
     if(rect.height == -1)   rect.height = bmp->get_height();
     
     mBitmap = bmp;
-
     mBitmapData  = mBitmap->get_data();
     setGaussRegion(rect);
 }
@@ -95,15 +89,6 @@ void GaussFilterDrawable::setGaussRegion(Rect rect){
     }
 }
 
-void GaussFilterDrawable::setGaussColorDev(float colorDev){
-    mColorDev = colorDev;
-}
-
-void GaussFilterDrawable::setGaussColorNoiseRange(int min,int max){
-    mColorNoiseMin = min;
-    mColorNoiseMax = max;
-}
-
 void GaussFilterDrawable::setCornerRadii(int radius){
     mRadii[0] = mRadii[1] = radius;
     mRadii[2] = mRadii[3] = radius;
@@ -132,12 +117,14 @@ void GaussFilterDrawable::computeBitmapSize(){
     if(mGaussRegion.bottom() > mBitmap->get_height()){
         mGaussRegion.height = mBitmap->get_height()-mGaussRegion.top;
     } 
-    mGaussWidth = std::ceil((float)mGaussRegion.width/mScale);
-    mGaussHeight = std::ceil((float)mGaussRegion.height/mScale);
+    mGaussWidth = std::ceil((float)mGaussRegion.width*mScale);
+    mGaussHeight = std::ceil((float)mGaussRegion.height*mScale);
 
-    mGaussWidth += mGaussWidth%4;
-    mGaussRegion.width = mGaussWidth*mScale;
-    LOGE("(%d, %d)mGaussWidth = %d mGaussHeight = %d",mGaussRegion.left,mGaussRegion.top,mGaussWidth,mGaussHeight);
+    if( mGaussWidth % 4 != 0 ){
+        mGaussWidth = (mGaussWidth + 3) & ~3; // 4字节对齐
+        mScale = (float)mGaussWidth/mGaussRegion.width;
+    }
+    LOGE("(%d, %d)mGaussWidth = %d mGaussHeight = %d mScale = %f",mGaussRegion.left,mGaussRegion.top,mGaussWidth,mGaussHeight, mScale);
 }
 
 void GaussFilterDrawable::computeBitmapGasuss(){
@@ -158,12 +145,12 @@ void GaussFilterDrawable::computeBitmapGasuss(){
 
     // 设置缩放和转换参数
     pixman_transform_t transform;
-    pixman_transform_init_scale(&transform, pixman_double_to_fixed(mScale),pixman_double_to_fixed(mScale));
+    pixman_transform_init_scale(&transform, pixman_double_to_fixed(1.f/mScale),pixman_double_to_fixed(1.f/mScale));
 
     // 执行缩放和格式转换
     pixman_image_set_filter(srcImage, PIXMAN_FILTER_NEAREST, NULL, 0);
     pixman_image_set_transform(srcImage, &transform);
-    pixman_image_composite(PIXMAN_OP_SRC, srcImage, NULL, dstImage, mGaussRegion.left/mScale,mGaussRegion.top/mScale, 0, 0, 0, 0, mGaussWidth, mGaussHeight);
+    pixman_image_composite(PIXMAN_OP_SRC, srcImage, NULL, dstImage, std::ceil((float)mGaussRegion.left*mScale),std::ceil((float)mGaussRegion.top*mScale), 0, 0, 0, 0, mGaussWidth, mGaussHeight);
 
     // 创建一个 Pixman 蒙版
     pixman_color_t color_t = {
@@ -205,12 +192,12 @@ void GaussFilterDrawable::computeBitmapGasuss(){
     dstImage = pixman_image_create_bits(PIXMAN_a8r8g8b8, mBitmap->get_width(), mBitmap->get_height(),(uint32_t *)mBitmapData, mBitmap->get_width() * 4);
     
     // 设置缩放和转换参数
-    pixman_transform_init_scale(&transform, pixman_double_to_fixed(1.0f/mScale),pixman_double_to_fixed(1.0f/mScale));
+    pixman_transform_init_scale(&transform, pixman_double_to_fixed(mScale),pixman_double_to_fixed(mScale));
 
     // 执行缩放和格式转换
     pixman_image_set_filter(srcImage, PIXMAN_FILTER_NEAREST, NULL, 0);
     pixman_image_set_transform(srcImage, &transform);
-    pixman_image_composite(PIXMAN_OP_SRC, srcImage, NULL, dstImage, 0, 0, 0, 0, mGaussRegion.left,mGaussRegion.top, mGaussWidth*mScale, mGaussHeight*mScale);
+    pixman_image_composite(PIXMAN_OP_SRC, srcImage, NULL, dstImage, 0, 0, 0, 0, mGaussRegion.left,mGaussRegion.top, mGaussRegion.width, mGaussRegion.height);
 
     LOGI("diff Time = %ld",SystemClock::uptimeMillis()-startTime3);
 

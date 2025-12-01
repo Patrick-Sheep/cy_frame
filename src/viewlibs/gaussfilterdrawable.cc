@@ -8,30 +8,12 @@
 #define USER_NENO 1
 #include <pixman.h>
 
-GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,double scale,float colorDev, int noiseMin, int noiseMax):mGaussRadius(ksize){
-    mGaussRegion.setEmpty();
-    bitmapRGBData = nullptr;
-    bitmapRGBGaussData = nullptr;
-    mBitmapData = nullptr;
-
-    mRadii[0] = mRadii[1] = 0;
-    mRadii[2] = mRadii[3] = 0;
-
-    mPaddingLeft    = mPaddingTop    = 0;
-    mPaddingRight   = mPaddingBottom = 0;
-
-    mScale = scale;
-    mFromView = fromView;
-    setGaussBitmip(mFromView,rect);
-
-    computeBitmapGasuss();
-}
-
 GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,double scale,int maskColor, bool isGauss):mGaussRadius(ksize){
     mGaussRegion.setEmpty();
     bitmapRGBData = nullptr;
     bitmapRGBGaussData = nullptr;
     mBitmapData = nullptr;
+    mFirstDraw = false;
 
     mRadii[0] = mRadii[1] = 0;
     mRadii[2] = mRadii[3] = 0;
@@ -46,6 +28,26 @@ GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,doub
     setGaussBitmip(mFromView,rect);
 
     if(isGauss) computeBitmapGasuss();
+}
+
+GaussFilterDrawable::GaussFilterDrawable(Rect rect,int ksize,double scale /* = 2*/,int maskColor/* = 0x66000000 */):mGaussRadius(ksize){
+    mGaussRegion.setEmpty();
+    bitmapRGBData = nullptr;
+    bitmapRGBGaussData = nullptr;
+    mBitmapData = nullptr;
+    mFirstDraw = true;
+
+    mRadii[0] = mRadii[1] = 0;
+    mRadii[2] = mRadii[3] = 0;
+
+    mPaddingLeft    = mPaddingTop    = 0;
+    mPaddingRight   = mPaddingBottom = 0;
+
+    mMaskColor = maskColor;
+
+    mScale = scale;
+    
+    mGaussRegion = rect;
 }
 
 GaussFilterDrawable::~GaussFilterDrawable(){
@@ -213,10 +215,35 @@ void GaussFilterDrawable::computeBitmapGasuss(){
 }   
 
 void GaussFilterDrawable::draw(Canvas&canvas){
-    if(mBitmap == nullptr) return;
     LOGV("mGaussWidth = %d mGaussHeight = %d mGaussRadius = %d",mGaussWidth,mGaussHeight,mGaussRadius);
     int64_t startTime = SystemClock::uptimeMillis();
 
+    // 可以直接对canvas的部分进行模糊
+    if(mFirstDraw){
+        Cairo::RefPtr<Cairo::ImageSurface> canvasimg = std::dynamic_pointer_cast<Cairo::ImageSurface>(canvas.get_target());
+        if(mGaussRegion.width == -1)    mGaussRegion.width  = canvasimg->get_width();
+        if(mGaussRegion.height == -1)   mGaussRegion.height = canvasimg->get_height();
+#if 0
+        mBitmap = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,canvasimg->get_width(), canvasimg->get_height());
+        Canvas *mcanvas = new Canvas(mBitmap);
+        mcanvas->set_source(canvasimg,0,0);
+        memcpy(mBitmap->get_data(),canvasimg->get_data(),canvasimg->get_stride()*canvasimg->get_height());
+        mcanvas->paint();
+        mBitmapData = mBitmap->get_data();
+        delete mcanvas;
+#else
+        mBitmap = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,canvasimg->get_width(), canvasimg->get_height());
+        memcpy(mBitmap->get_data(),canvasimg->get_data(),canvasimg->get_stride()*canvasimg->get_height());
+        mBitmapData = mBitmap->get_data();
+#endif
+        LOGE("diff draw time = %lld",SystemClock::uptimeMillis() - startTime);
+
+        computeBitmapSize();
+        mGaussData   = mBitmapData+(mGaussRegion.top*mBitmap->get_stride()+mGaussRegion.left*4);
+        mGaissBitmap = Cairo::ImageSurface::create(mGaussData,Cairo::Surface::Format::ARGB32,mGaussRegion.width, mGaussRegion.height,mBitmap->get_stride());
+        computeBitmapGasuss();
+        mFirstDraw = false;
+    }
     // 实现四边圆角（负角度仅个人项目需求：提示框的右下角是反圆角差不多的效果，因此做了个反圆角的判断）
     if(mRadii[0]||mRadii[1]||mRadii[2]||mRadii[3]){
         const double degrees = M_PI / 180.f;

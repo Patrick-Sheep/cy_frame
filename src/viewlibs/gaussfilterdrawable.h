@@ -1,3 +1,17 @@
+/*
+ * @Author: cy
+ * @Email: 964028708@qq.com
+ * @Date: 2025-05-16 14:52:37
+ * @LastEditTime: 2025-12-01 09:22:16
+ * @FilePath: /cy_frame/src/viewlibs/gaussfilterdrawable.h
+ * @Description: 高斯模糊
+ * @BugList:1、不使用fromview的方法，待测试
+ *          2、不适用fromview的方法，scale的值为3时，概率会出问题，待处理
+ * 
+ * Copyright (c) 2025 by cy, All Rights Reserved. 
+ * 
+*/
+
 #ifndef __GAUSS_FILTER_DRAWABLE_H__
 #define __GAUSS_FILTER_DRAWABLE_H__
 // #include <drawables/drawable.h>
@@ -17,6 +31,7 @@ private:
     Rect        mGaussRegion;
     int         mGaussWidth;
     int         mGaussHeight;
+    bool        mFirstDraw;
     Cairo::RefPtr<Cairo::ImageSurface>mBitmap;
     Cairo::RefPtr<Cairo::ImageSurface>mGaissBitmap;
 
@@ -32,21 +47,20 @@ protected:
     int mMaskColor;
 
 public:
-    // 使用每个像素赋值的做法，ARGB转换RGB
-    // fromview：模糊图像的源控件
-    // rect：模糊图像，在fromview相对的位置以及大小
-    // ksize：模糊半径（越大越模糊）
-    // scale：先将图像缩小的倍率（加快模糊时间，但失真更严重，建议0.3 - 0.5，越小越模糊）
-    // colorDev：每个像素乘以一个系数，以达到类似蒙版的效果
-    // noiseMin、noiseMax：抖动随机数的最大值最小值，建议是 -2、2
-    GaussFilterDrawable(View *fromView,Rect rect,int ksize,double scale,float colorDev /* = 1.0 */, int noiseMin /* = -1 */, int noiseMax /* = 1 */);
-    // 使用 pixman ，ARGB转换RGB。
     // fromview：模糊图像的源控件
     // rect：模糊图像，在fromview相对的位置以及大小
     // ksize：模糊半径（越大越模糊）
     // scale：先将图像缩小的倍率（加快模糊时间，但失真更严重，建议0.3 - 0.5，越小越模糊）
     // maskColor：蒙版的颜色
     GaussFilterDrawable(View *fromView,Rect rect,int ksize,double scale /* = 2*/,int maskColor/* = 0x66000000 */ , bool isGauss = true);
+    
+    // rect：模糊图像，在fromview相对的位置以及大小
+    // ksize：模糊半径（越大越模糊）
+    // scale：先将图像缩小的倍率（加快模糊时间，但失真更严重，建议2-3，越大越模糊）
+    // maskColor：蒙版的颜色
+    // 该版本图像源从canvas、获取
+    GaussFilterDrawable(Rect rect,int ksize,double scale /* = 2*/,int maskColor/* = 0x66000000 */);
+    
     ~GaussFilterDrawable();
     void setGaussBitmip(Cairo::RefPtr<Cairo::ImageSurface> &bmp,Rect rect);
     void setGaussBitmip(View *fromView,Rect rect);

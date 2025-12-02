@@ -2,7 +2,7 @@
  * @Author: cy
  * @Email: patrickcchan@163.com
  * @Date: 2024-05-22 14:51:04
- * @LastEditTime: 2025-11-27 11:46:03
+ * @LastEditTime: 2025-12-01 09:56:44
  * @FilePath: /cy_frame/src/windows/wind_base.h
  * @Description: 窗口类
  * @BugList:
@@ -97,6 +97,8 @@ public:
     void      removePop();
     void      hideToast();
     void      hideAll();
+
+    Cairo::RefPtr<Cairo::Region>  getPendingRgn();
 private:
     bool      selfKey(uint16_t keyCode, uint8_t status);
     

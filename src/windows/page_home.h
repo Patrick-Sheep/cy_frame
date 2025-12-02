@@ -2,7 +2,7 @@
  * @Author: Ricken
  * @Email: me@ricken.cn
  * @Date: 2024-05-23 00:04:23
- * @LastEditTime: 2025-11-26 10:46:21
+ * @LastEditTime: 2025-12-02 09:20:13
  * @FilePath: /cy_frame/src/windows/page_home.h
  * @Description: 主页面
  * @BugList:
@@ -26,6 +26,12 @@ protected:
     void setView() override;
 
     void onTick() override;
+private:
+    TextView* tv;
+    TextView* tv2;
+    View *gaussView;
+    Runnable runnable;
+    Runnable runnable2;
 };
 
 #endif // !_PAGE_HOME_H_

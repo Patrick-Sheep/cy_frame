@@ -2,7 +2,7 @@
  * @Author: cy
  * @Email: patrickcchan@163.com
  * @Date: 2024-05-22 14:51:04
- * @LastEditTime: 2025-11-27 14:37:59
+ * @LastEditTime: 2025-12-01 17:59:32
  * @FilePath: /cy_frame/src/windows/wind_base.cc
  * @Description: 窗口类
  * @BugList:
@@ -154,7 +154,7 @@ void BaseWindow::init() {
         }
     });
 
-    showLogo();
+    // showLogo();
 }
 
 /// @brief 显示 LOGO
@@ -392,6 +392,10 @@ void BaseWindow::hideAll() {
     mPopBox->setVisibility(GONE);
     hideToast();
     mBlackView->setVisibility(GONE);
+}
+
+Cairo::RefPtr<Cairo::Region> BaseWindow::getPendingRgn() {
+    return mPendingRgn;
 }
 
 bool BaseWindow::selfKey(uint16_t keyCode, uint8_t status) {

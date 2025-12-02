@@ -2,7 +2,7 @@
  * @Author: cy
  * @Email: patrickcchan@163.com
  * @Date: 2025-01-18 11:33:02
- * @LastEditTime: 2025-11-27 03:41:04
+ * @LastEditTime: 2025-11-27 18:01:17
  * @FilePath: /cy_frame/config/series_info.h
  * @Description: 项目硬件参数
  * @BugList: 
@@ -24,9 +24,9 @@
 #define CPU_BRAND    "Sigmstar"
 
 //screen config
-#define SCREEN_WIDTH   800
+#define SCREEN_WIDTH   1280
 #define SCREEN_HEIGHT  480
-#define SCREEN_SIZE    "800*480"
+#define SCREEN_SIZE    "1280*480"
 
 #define FUNCTION_WIRE    1
 #ifdef DEBUG

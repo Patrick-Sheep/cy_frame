@@ -2,7 +2,7 @@
  * @Author: cy
  * @Email: 964028708@qq.com
  * @Date: 2025-05-16 14:52:37
- * @LastEditTime: 2025-12-01 09:22:16
+ * @LastEditTime: 2025-12-02 09:58:42
  * @FilePath: /cy_frame/src/viewlibs/gaussfilterdrawable.h
  * @Description: 高斯模糊
  * @BugList:1、不使用fromview的方法，待测试
@@ -22,6 +22,7 @@ class GaussFilterDrawable:public Drawable{
 private:
     unsigned char *mBitmapData;
     unsigned char *mGaussData;
+    
     unsigned char *bitmapRGBData;
     unsigned char *bitmapRGBGaussData;
     View        *mFromView;
@@ -33,6 +34,7 @@ private:
     int         mGaussHeight;
     bool        mFirstDraw;
     Cairo::RefPtr<Cairo::ImageSurface>mBitmap;
+    Cairo::RefPtr<Cairo::ImageSurface>mDrawBitmap;
     Cairo::RefPtr<Cairo::ImageSurface>mGaissBitmap;
 
 protected:

@@ -91,8 +91,7 @@ void GaussFilterDrawable::setGaussRegion(Rect rect){
     if(mGaussRegion != rect){
         mGaussRegion = rect;
         computeBitmapSize();
-        mGaussData   = mBitmapData+(mGaussRegion.top*mBitmap->get_stride()+mGaussRegion.left*4);
-        mGaissBitmap = Cairo::ImageSurface::create(mGaussData,Cairo::Surface::Format::ARGB32,mGaussRegion.width, mGaussRegion.height,mBitmap->get_stride());
+        mDrawBitmap = Cairo::ImageSurface::create(mGaussData+(mGaussRegion.top*mBitmap->get_stride()+mGaussRegion.left*4),Cairo::Surface::Format::ARGB32,mGaussRegion.width, mGaussRegion.height,mBitmap->get_stride());
     }
 }
 
@@ -123,12 +122,13 @@ void GaussFilterDrawable::computeBitmapSize(){
     if(mGaussRegion.bottom() > mBitmap->get_height()){
         mGaussRegion.height = mBitmap->get_height()-mGaussRegion.top;
     } 
-    mGaussWidth = std::ceil((float)mGaussRegion.width*mScale);
-    mGaussHeight = std::ceil((float)mGaussRegion.height*mScale);
+    mGaussWidth = std::round((float)mGaussRegion.width*mScale);
+    mGaussHeight = std::round((float)mGaussRegion.height*mScale);
 
     if( mGaussWidth % 4 != 0 ){
         mGaussWidth = (mGaussWidth + 3) & ~3; // 4字节对齐
         mScale = (float)mGaussWidth/mGaussRegion.width;
+        mGaussHeight = std::round((float)mGaussRegion.height*mScale);
     }
     LOGE("(%d, %d)mGaussWidth = %d mGaussHeight = %d mScale = %f",mGaussRegion.left,mGaussRegion.top,mGaussWidth,mGaussHeight, mScale);
 }
@@ -156,7 +156,7 @@ void GaussFilterDrawable::computeBitmapGasuss(){
     // 执行缩放和格式转换
     pixman_image_set_filter(srcImage, PIXMAN_FILTER_NEAREST, NULL, 0);
     pixman_image_set_transform(srcImage, &transform);
-    pixman_image_composite(PIXMAN_OP_SRC, srcImage, NULL, dstImage, std::ceil((float)mGaussRegion.left*mScale),std::ceil((float)mGaussRegion.top*mScale), 0, 0, 0, 0, mGaussWidth, mGaussHeight);
+    pixman_image_composite(PIXMAN_OP_SRC, srcImage, NULL, dstImage, std::round((float)mGaussRegion.left*mScale),std::round((float)mGaussRegion.top*mScale), 0, 0, 0, 0, mGaussWidth, mGaussHeight);
 
     // 创建一个 Pixman 蒙版
     pixman_color_t color_t = {
@@ -232,12 +232,10 @@ void GaussFilterDrawable::draw(Canvas&canvas){
             mBitmapData = mBitmap->get_data();
 
             // 高斯模糊后图像
-            mGaissBitmap = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,mGaussRegion.width, mGaussRegion.height);
+            mGaissBitmap = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,canvasimg->get_width(), canvasimg->get_height());
             mGaussData = mGaissBitmap->get_data();
 
-            unsigned char *drawData = mGaussData+(mGaussRegion.top*mBitmap->get_stride()+mGaussRegion.left*4);
-            mDrawBitmap = Cairo::ImageSurface::create(drawData,Cairo::Surface::Format::ARGB32,canvasimg->get_width(), canvasimg->get_height(),mBitmap->get_stride());
-            
+            mDrawBitmap = Cairo::ImageSurface::create(mGaussData+(mGaussRegion.top*mBitmap->get_stride()+mGaussRegion.left*4),Cairo::Surface::Format::ARGB32,mGaussRegion.width, mGaussRegion.height,mBitmap->get_stride());
             computeBitmapSize();
         }
 
@@ -253,11 +251,12 @@ void GaussFilterDrawable::draw(Canvas&canvas){
         // 获取当前绘制的裁剪区域
         try {
             std::vector<Cairo::Rectangle>clip_rects;
+            Cairo::Matrix matrix;
             canvas.copy_clip_rectangle_list(clip_rects);
+            canvas.get_matrix(matrix);  // 获取canvas移动的位置
             for(int i=0;i<clip_rects.size();i++){
                 Cairo::Rectangle r=clip_rects.at(i);
-                LOGI("[%d]=(%.f,%.f,%.f,%.f)",i,r.x,r.y,r.width,r.height);
-                Rect rect = Rect::Make(r.x, r.y, r.width, r.height);
+                Rect rect = Rect::Make(r.x+matrix.x0, r.y+matrix.y0, r.width, r.height);
                 // 判断是否重叠
                 if(mGaussRegion.contains(rect)){
                     // 获取重叠区域
@@ -308,10 +307,9 @@ void GaussFilterDrawable::draw(Canvas&canvas){
 #endif
         pixman_image_unref(srcImage);
         if(isNeedGauss){
-            
             computeBitmapGasuss();
         }
-        LOGE("diff draw time = %lld",SystemClock::uptimeMillis() - startTime);
+        LOGE("diff draw time = %lld  isNeedGauss = %d",SystemClock::uptimeMillis() - startTime,isNeedGauss);
         mFirstDraw = true;
     }
     // 实现四边圆角（负角度仅个人项目需求：提示框的右下角是反圆角差不多的效果，因此做了个反圆角的判断）
@@ -335,6 +333,7 @@ void GaussFilterDrawable::draw(Canvas&canvas){
         canvas.close_path();
         canvas.clip();
     }
+    LOGE("(%d,%d,%d,%d)  get_width = %d",mBounds.left,mBounds.top,mBounds.width,mBounds.height,mDrawBitmap->get_width());
     canvas.save();
     canvas.rectangle(mBounds.left,mBounds.top,mBounds.width,mBounds.height); // 限制绘画区域，加快刷新速率
     canvas.clip();

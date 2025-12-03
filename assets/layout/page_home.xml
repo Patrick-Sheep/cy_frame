@@ -32,8 +32,8 @@
 
     <RelativeLayout
         android:id="@+id/gauss"
-        android:layout_width="1280dp"
-        android:layout_height="480dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:background="#455353ff">
 
         <TextView
@@ -41,11 +41,10 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="50dp"
             android:gravity="center"
             android:text="test"
             android:textColor="#123456"
-            android:textSize="80dp"
+            android:textSize="40dp"
             android:background="#30FF0000"/>
 
     </RelativeLayout>

@@ -2,7 +2,7 @@
  * @Author: cy
  * @Email: patrickcchan@163.com
  * @Date: 2024-05-23 00:04:17
- * @LastEditTime: 2025-12-02 10:10:26
+ * @LastEditTime: 2025-12-03 10:21:35
  * @FilePath: /cy_frame/src/windows/page_home.cc
  * @Description:
  * @BugList:
@@ -16,6 +16,7 @@
 
 #include "page_home.h"
 #include "wind_mgr.h"
+#include <widget/relativelayout.h>
 
 HomePage::HomePage() :PageBase("@layout/page_home") {
     initUI();
@@ -50,9 +51,9 @@ void HomePage::setView() {
         gaussView->setVisibility(View::VISIBLE);
     });
 
-    gaussView->setOnClickListener([this](View &){
-        gaussView->setVisibility(View::GONE);
-    });
+    // gaussView->setOnClickListener([this](View &){
+    //     gaussView->setVisibility(View::GONE);
+    // });
     
 
     LOGE("gaussView = %p tv = %p",gaussView,tv);
@@ -81,6 +82,22 @@ void HomePage::setView() {
             mRootView->postDelayed(runnable2,1000);
         }
     };
-    mRootView->postDelayed(runnable,2000);
+    // mRootView->postDelayed(runnable,2000);
 
+    mRootView->post([this](){
+        gaussView->setBackground(new GaussFilterDrawable({0,0,300,300},10,0.33,0x66000000));
+    });
+    
+
+    mRootView->setOnTouchListener([this](View &v, MotionEvent &event){
+        if((event.getAction() == MotionEvent::ACTION_DOWN) || (event.getAction() == MotionEvent::ACTION_MOVE)){
+            ((GaussFilterDrawable *)gaussView->getBackground()) \
+                ->setGaussRegion({(int)event.getX(),(int)event.getY(),200,200});
+            gaussView->setX(event.getX());
+            gaussView->setY(event.getY());
+            // ((MarginLayoutParams *)gaussView->getLayoutParams())
+            gaussView->invalidate();
+        }
+        return true;
+    });
 }

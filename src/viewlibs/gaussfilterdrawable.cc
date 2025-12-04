@@ -91,6 +91,9 @@ void GaussFilterDrawable::setGaussRegion(Rect rect){
     if(mGaussRegion != rect){
         mGaussRegion = rect;
         computeBitmapSize();
+        // 高斯模糊后图像
+        mGaissBitmap = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,mFromView->getWidth(), mFromView->getHeight());
+        mGaussData = mGaissBitmap->get_data();
         mDrawBitmap = Cairo::ImageSurface::create(mGaussData+(mGaussRegion.top*mBitmap->get_stride()+mGaussRegion.left*4),Cairo::Surface::Format::ARGB32,mGaussRegion.width, mGaussRegion.height,mBitmap->get_stride());
     }
 }

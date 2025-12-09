@@ -2,7 +2,7 @@
  * @Author: cy
  * @Email: 964028708@qq.com
  * @Date: 2025-05-16 14:52:37
- * @LastEditTime: 2025-12-02 09:58:42
+ * @LastEditTime: 2025-12-09 15:15:27
  * @FilePath: /cy_frame/src/viewlibs/gaussfilterdrawable.h
  * @Description: 高斯模糊
  * @BugList:1、不使用fromview的方法，待测试
@@ -23,8 +23,6 @@ private:
     unsigned char *mBitmapData;
     unsigned char *mGaussData;
     
-    unsigned char *bitmapRGBData;
-    unsigned char *bitmapRGBGaussData;
     View        *mFromView;
     int         mGaussRadius;
     double      mScale;     // 先将图层进行缩放，再进行模糊计算

@@ -13,10 +13,10 @@
 
 using namespace Cairo;
 
-GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,double scale,int maskColor, bool isGauss):mGaussRadius(ksize){
+GaussFilterDrawable::GaussFilterDrawable(View *fromView, int ksize/* =50 */,double scale /* = 2 */,int maskColor/* = 0x66000000 */, bool drawOnce/* = false */):mGaussRadius(ksize){
+    mDrawRegion.setEmpty();
     mGaussRegion.setEmpty();
-    mBitmapData = nullptr;
-    mFirstDraw = false;
+    mDrawOnce = drawOnce;
 
     mRadii[0] = mRadii[1] = 0;
     mRadii[2] = mRadii[3] = 0;
@@ -25,18 +25,14 @@ GaussFilterDrawable::GaussFilterDrawable(View *fromView,Rect rect,int ksize,doub
     mPaddingRight   = mPaddingBottom = 0;
 
     mMaskColor = maskColor;
-
     mScale = scale;
     mFromView = fromView;
-    setGaussBitmip(mFromView,rect);
-
-    if(isGauss) computeBitmapGasuss();
 }
 
-GaussFilterDrawable::GaussFilterDrawable(Rect rect,int ksize,double scale /* = 2*/,int maskColor/* = 0x66000000 */):mGaussRadius(ksize){
+GaussFilterDrawable::GaussFilterDrawable(Rect rect,int ksize/* =50 */,double scale /* = 2 */,int maskColor/* = 0x66000000 */, bool drawOnce/* = false */):mGaussRadius(ksize){
+    mDrawRegion.setEmpty();
     mGaussRegion.setEmpty();
-    mBitmapData = nullptr;
-    mFirstDraw = true;
+    mDrawOnce = drawOnce;
 
     mRadii[0] = mRadii[1] = 0;
     mRadii[2] = mRadii[3] = 0;
@@ -45,58 +41,25 @@ GaussFilterDrawable::GaussFilterDrawable(Rect rect,int ksize,double scale /* = 2
     mPaddingRight   = mPaddingBottom = 0;
 
     mMaskColor = maskColor;
-
     mScale = scale;
-    
-    mGaussRegion = rect;
+    mDrawRegion = rect;
 }
 
 GaussFilterDrawable::~GaussFilterDrawable(){
     
 }
 
-void GaussFilterDrawable::setGaussBitmip(Cairo::RefPtr<Cairo::ImageSurface> &bmp,Rect rect){
-    if(rect.width == -1)    rect.width  = bmp->get_width();
-    if(rect.height == -1)   rect.height = bmp->get_height();
-    
-    mBitmap = bmp;
-    mBitmapData  = mBitmap->get_data();
-    setGaussRegion(rect);
-}
-
-void GaussFilterDrawable::setGaussBitmip(View *fromView,Rect rect){
-    if(rect.width == -1)    rect.width  = fromView->getWidth();
-    if(rect.height == -1)   rect.height = fromView->getHeight();
-    
-    mBitmap = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,fromView->getWidth(), fromView->getHeight());
-    Canvas *mcanvas = new Canvas(mBitmap);
-    fromView->draw(*mcanvas);
-    delete mcanvas;
-
-    mBitmapData  = mBitmap->get_data();
-    setGaussRegion(rect);
-}
-
 void GaussFilterDrawable::setGaussRadius(int radius){
     if(mGaussRadius != radius){
         mGaussRadius = radius;
-    }
-}
-
-void GaussFilterDrawable::setGaussRegion(Rect rect){
-    if(mGaussRegion != rect){
-        mGaussRegion = rect;
-        computeBitmapSize();
-        // 高斯模糊后图像
-        mGaissBitmap = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,mFromView->getWidth(), mFromView->getHeight());
-        mGaussData = mGaissBitmap->get_data();
-        mDrawBitmap = Cairo::ImageSurface::create(mGaussData+(mGaussRegion.top*mBitmap->get_stride()+mGaussRegion.left*4),Cairo::Surface::Format::ARGB32,mGaussRegion.width, mGaussRegion.height,mBitmap->get_stride());
+        invalidateSelf();
     }
 }
 
 void GaussFilterDrawable::setCornerRadii(int radius){
     mRadii[0] = mRadii[1] = radius;
     mRadii[2] = mRadii[3] = radius;
+    invalidateSelf();
 }
 
 void GaussFilterDrawable::setCornerRadii(int topLeftRadius,int topRightRadius,int bottomRightRadius,int bottomLeftRadius){
@@ -104,7 +67,7 @@ void GaussFilterDrawable::setCornerRadii(int topLeftRadius,int topRightRadius,in
     mRadii[1] = topRightRadius;
     mRadii[2] = bottomRightRadius;
     mRadii[3] = bottomLeftRadius;
-    
+    invalidateSelf();
 }
 
 void GaussFilterDrawable::setPadding(int LeftPadding,int topPadding,int rightPadding,int bottomPadding){
@@ -112,34 +75,68 @@ void GaussFilterDrawable::setPadding(int LeftPadding,int topPadding,int rightPad
     mPaddingTop    = topPadding;
     mPaddingRight  = rightPadding;
     mPaddingBottom = bottomPadding;
+    invalidateSelf();
 }
 
 void GaussFilterDrawable::computeBitmapSize(){
-    if(mGaussRegion.right() > mBitmap->get_width()){
-        mGaussRegion.width = mBitmap->get_width()-mGaussRegion.left;
+    if(mFromView){
+        int loc[2] = { 0 };
+        mFromView->getLocationInWindow(loc);
+        mDrawRegion.width = mFromView->getWidth();
+        mDrawRegion.height = mFromView->getHeight();
+        mDrawRegion.left = loc[0];
+        mDrawRegion.top = loc[1];
+    }else{
+        if(mDrawRegion.width == -1)    mDrawRegion.width  = mBitmap->get_width();
+        if(mDrawRegion.height == -1)   mDrawRegion.height = mBitmap->get_height();
+    }
+
+    if(mDrawRegion.right() > mBitmap->get_width()){
+        mDrawRegion.width = mBitmap->get_width()-mDrawRegion.left;
     } 
-    if(mGaussRegion.bottom() > mBitmap->get_height()){
-        mGaussRegion.height = mBitmap->get_height()-mGaussRegion.top;
+    if(mDrawRegion.bottom() > mBitmap->get_height()){
+        mDrawRegion.height = mBitmap->get_height()-mDrawRegion.top;
     } 
+
+    extendedRect(mDrawRegion, mGaussRegion);
+    
     mGaussWidth = std::round((float)mGaussRegion.width*mScale);
     mGaussHeight = std::round((float)mGaussRegion.height*mScale);
 
     if( mGaussWidth % 4 != 0 ){
         mGaussWidth = (mGaussWidth + 3) & ~3; // 4字节对齐
-        mScale = (float)mGaussWidth/mGaussRegion.width;
-        mGaussHeight = std::round((float)mGaussRegion.height*mScale);
+        mGaussScale = (float)mGaussWidth/mGaussRegion.width;
+        mGaussHeight = std::round((float)mGaussRegion.height*mGaussScale);
+    }else{
+        mGaussScale = mScale;
     }
-    LOGE("(%d, %d)mGaussWidth = %d mGaussHeight = %d mScale = %f",mGaussRegion.left,mGaussRegion.top,mGaussWidth,mGaussHeight, mScale);
+    LOGV("(%d, %d)mGaussWidth = %d mGaussHeight = %d mScale = %f mGaussScale = %f",mGaussRegion.left,mGaussRegion.top,mGaussWidth,mGaussHeight, mScale, mGaussScale);
 }
 
-// 手动实现像素旋转，不依赖pixman变换
-void rotatePixelsDirect(uint32_t* srcData, uint32_t* dstData, int srcWidth, int srcHeight,  int rotation) {
+// 根据模糊半径，拓展矩形
+void GaussFilterDrawable::extendedRect(Rect srcRect, Rect &dstRect){
+    int gaussRadius = std::round((float)mGaussRadius / mScale);
+    int gaussLeft = ((srcRect.left - gaussRadius) > 0) ? (srcRect.left - gaussRadius) : 0;
+    int gaussTop  = ((srcRect.top - gaussRadius) > 0) ? (srcRect.top - gaussRadius) : 0;
+    int gaussWidth  = ((srcRect.width + gaussRadius + (srcRect.left - gaussLeft)) < mBitmap->get_width()) ? (srcRect.width + gaussRadius + (srcRect.left - gaussLeft)) : (mBitmap->get_width() - gaussLeft);
+    int gaussHeight = ((srcRect.height + gaussRadius + (srcRect.top - gaussTop)) < mBitmap->get_height()) ? (srcRect.height + gaussRadius + (srcRect.top - gaussTop)) : (mBitmap->get_height() - gaussTop);
+    
+    dstRect.set(gaussLeft, gaussTop, gaussWidth, gaussHeight);
+
+    LOGV("srcRect(%d, %d, %d, %d) dstRect(%d, %d, %d, %d) gaussRadius = %d", srcRect.left, srcRect.top, srcRect.width, srcRect.height, dstRect.left, dstRect.top, dstRect.width, dstRect.height, gaussRadius);
+}
+
+// pixman 实现旋转, src 是 canvas 的数据，dst 是 bitmap 的数据
+// srcRect 是 canvas 的矩形，copyRect 是 bitmap 的矩形
+void GaussFilterDrawable::rotatePixelsDirect(uint32_t* srcData, uint32_t* dstData, Rect srcRect, Rect copyRect,  int rotation) {
     int64_t startTime = SystemClock::uptimeMillis();
 
      // 创建目标 surface
     const int swapeWH = (rotation == Display::ROTATION_90)||(rotation == Display::ROTATION_270);
 
     // 逻辑尺寸（旋转前的原始尺寸）
+    const int srcWidth = srcRect.width;
+    const int srcHeight = srcRect.height;
     const int logicalWidth = swapeWH ? srcHeight : srcWidth;
     const int logicalHeight = swapeWH ? srcWidth : srcHeight;
 
@@ -207,14 +204,14 @@ void rotatePixelsDirect(uint32_t* srcData, uint32_t* dstData, int srcWidth, int 
     // 执行图像合成（旋转操作）
     pixman_image_composite(PIXMAN_OP_SRC,
                         srcImage, nullptr, dstImage,
-                        0, 0, 0, 0, 0, 0,
-                        logicalWidth, logicalHeight);
+                        copyRect.left, copyRect.top, 0, 0, copyRect.left, copyRect.top, copyRect.width, copyRect.height);
     
     // 清理资源
     pixman_image_unref(srcImage);
     pixman_image_unref(dstImage);
-    LOGI("rotateTime = %lld", SystemClock::uptimeMillis() - startTime);
+    LOGV("rotateTime = %lld", SystemClock::uptimeMillis() - startTime);
 }
+
 
 void GaussFilterDrawable::computeBitmapGasuss(){
 
@@ -233,12 +230,12 @@ void GaussFilterDrawable::computeBitmapGasuss(){
 
     // 设置缩放和转换参数
     pixman_transform_t transform;
-    pixman_transform_init_scale(&transform, pixman_double_to_fixed(1.f/mScale),pixman_double_to_fixed(1.f/mScale));
+    pixman_transform_init_scale(&transform, pixman_double_to_fixed(1.f/mGaussScale),pixman_double_to_fixed(1.f/mGaussScale));
 
     // 执行缩放和格式转换
     pixman_image_set_filter(srcImage, PIXMAN_FILTER_NEAREST, NULL, 0);
     pixman_image_set_transform(srcImage, &transform);
-    pixman_image_composite(PIXMAN_OP_SRC, srcImage, NULL, dstImage, std::round((float)mGaussRegion.left*mScale),std::round((float)mGaussRegion.top*mScale), 0, 0, 0, 0, mGaussWidth, mGaussHeight);
+    pixman_image_composite(PIXMAN_OP_SRC, srcImage, NULL, dstImage, std::round((float)mGaussRegion.left*mGaussScale),std::round((float)mGaussRegion.top*mGaussScale), 0, 0, 0, 0, mGaussWidth, mGaussHeight);
 
     // 创建一个 Pixman 蒙版
     pixman_color_t color_t = {
@@ -256,7 +253,7 @@ void GaussFilterDrawable::computeBitmapGasuss(){
     pixman_image_unref(dstImage);
     pixman_image_unref(maskColorImage);
 
-    LOGI("scale copy Time = %lld",SystemClock::uptimeMillis()-startTime);
+    LOGV("scale copy Time = %lld",SystemClock::uptimeMillis()-startTime);
     
     int64_t startTime2 = SystemClock::uptimeMillis();
     //////////////////////////////////////////////////////////////////////////
@@ -268,7 +265,7 @@ void GaussFilterDrawable::computeBitmapGasuss(){
     GaussianBlurFilter(bitmapRGBData, mGaussWidth ,mGaussHeight, mGaussRadius);
 #endif
     /////////////////////////////////////////////////////////////////////////
-    LOGI("gaussianFilter_u8_Neon time = %ld USER_NENO = %d",SystemClock::uptimeMillis()-startTime2,USER_NENO);
+    LOGV("gaussianFilter_u8_Neon time = %ld USER_NENO = %d",SystemClock::uptimeMillis()-startTime2,USER_NENO);
     int64_t startTime3 = SystemClock::uptimeMillis();
 
     // 执行缩放的image
@@ -280,14 +277,14 @@ void GaussFilterDrawable::computeBitmapGasuss(){
     dstImage = pixman_image_create_bits(PIXMAN_a8r8g8b8, mBitmap->get_width(), mBitmap->get_height(),(uint32_t *)mGaussData, mBitmap->get_width() * 4);
     
     // 设置缩放和转换参数
-    pixman_transform_init_scale(&transform, pixman_double_to_fixed(mScale),pixman_double_to_fixed(mScale));
+    pixman_transform_init_scale(&transform, pixman_double_to_fixed(mGaussScale),pixman_double_to_fixed(mGaussScale));
 
     // 执行缩放和格式转换
     pixman_image_set_filter(srcImage, PIXMAN_FILTER_NEAREST, NULL, 0);
     pixman_image_set_transform(srcImage, &transform);
     pixman_image_composite(PIXMAN_OP_SRC, srcImage, NULL, dstImage, 0, 0, 0, 0, mGaussRegion.left,mGaussRegion.top, mGaussRegion.width, mGaussRegion.height);
 
-    LOGI("scale copy 2 Time = %ld",SystemClock::uptimeMillis()-startTime3);
+    LOGV("scale copy 2 Time = %ld",SystemClock::uptimeMillis()-startTime3);
 
     // // 释放资源
     pixman_image_unref(srcImage);
@@ -297,14 +294,14 @@ void GaussFilterDrawable::computeBitmapGasuss(){
 #if defined(USER_NENO) && (USER_NENO)
     free(bitmapRGBGaussData);
 #endif
-    LOGI("gauss all  Time = %ld",SystemClock::uptimeMillis()-startTime);
+    LOGV("gauss all  Time = %ld",SystemClock::uptimeMillis()-startTime);
 }   
 
 void GaussFilterDrawable::draw(Canvas&canvas){
     int64_t startTime = SystemClock::uptimeMillis();
 
     // 可以直接对canvas的部分进行模糊
-    if(mFirstDraw){
+    if(!mDrawOnce || (mBitmap == nullptr)){
         Cairo::RefPtr<Cairo::ImageSurface> canvasimg = std::dynamic_pointer_cast<Cairo::ImageSurface>(canvas.get_target());
         const int rotation  = WindowManager::getInstance().getDefaultDisplay().getRotation();
         const int swapeWH = (rotation == Display::ROTATION_90)||(rotation == Display::ROTATION_270);
@@ -315,12 +312,7 @@ void GaussFilterDrawable::draw(Canvas&canvas){
         const int logicalWidth = swapeWH ? canvasHeight : canvasWidth;
         const int logicalHeight = swapeWH ? canvasWidth : canvasHeight;
 
-        Cairo::RefPtr<Cairo::ImageSurface> rotateCanvasImg = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,logicalWidth, logicalHeight);
-        
-        rotatePixelsDirect((uint32_t*)canvasimg->get_data(), (uint32_t*)rotateCanvasImg->get_data(), canvasWidth, canvasHeight, rotation);
-
-        if(mGaussRegion.width == -1)    mGaussRegion.width  = logicalWidth;
-        if(mGaussRegion.height == -1)   mGaussRegion.height = logicalHeight;
+        bool firstDraw =false;
         if(mBitmap == nullptr){
             // 保存原始图像数据
             mBitmap = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,logicalWidth, logicalHeight);
@@ -330,13 +322,16 @@ void GaussFilterDrawable::draw(Canvas&canvas){
             mGaissBitmap = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32,logicalWidth, logicalHeight);
             mGaussData = mGaissBitmap->get_data();
 
-            mDrawBitmap = Cairo::ImageSurface::create(mGaussData+(mGaussRegion.top*mBitmap->get_stride()+mGaussRegion.left*4),Cairo::Surface::Format::ARGB32,mGaussRegion.width, mGaussRegion.height,mBitmap->get_stride());
-            computeBitmapSize();
+            firstDraw = true;
         }
+
+        computeBitmapSize();
+
+        mDrawBitmap = Cairo::ImageSurface::create(mGaussData+(mDrawRegion.top*mBitmap->get_stride()+mDrawRegion.left*4),Cairo::Surface::Format::ARGB32,mDrawRegion.width, mDrawRegion.height,mBitmap->get_stride());
 
         bool isNeedGauss = false; // 判断是否需要高斯模糊
         // 创建一个 Pixman 图像表面(源数据的image)
-        pixman_image_t* srcImage = pixman_image_create_bits(PIXMAN_a8r8g8b8, logicalWidth, logicalHeight, (uint32_t *)rotateCanvasImg->get_data(), rotateCanvasImg->get_stride());
+        pixman_image_t* srcImage = pixman_image_create_bits(PIXMAN_a8r8g8b8, logicalWidth, logicalHeight, (uint32_t *)canvasimg->get_data(), canvasimg->get_stride());
 #if 1
         // 获取当前绘制的裁剪区域
         try {
@@ -384,20 +379,19 @@ void GaussFilterDrawable::draw(Canvas&canvas){
                     rect = Rect::Make((int)std::round(r.y+matrix2.y0), (int)std::round(logicalHeight - (r.x+matrix2.x0+r.width)), (int)r.height,  (int)r.width);
                     break;
                 }
-                // LOGI("%d:rect=(%f,%f,%f,%f) --- (%d,%d,%d,%d)",i,r.x,r.y,matrix2.x0,matrix2.y0, rect.left, rect.top, rect.width, rect.height);
                 LOGV("%d:rect=(%d,%d,%d,%d)",i, rect.left, rect.top, rect.width, rect.height);
-                // 判断是否重叠
-                if(mGaussRegion.contains(rect)){
-                    // 获取重叠区域
-                    rect.intersect(mGaussRegion);
-                    // 创建目标图像
-                    pixman_image_t *dstImage = pixman_image_create_bits(PIXMAN_a8r8g8b8, mBitmap->get_width(), mBitmap->get_height(), (uint32_t *)mBitmapData, mBitmap->get_width() * 4);
-
-                    pixman_image_composite(PIXMAN_OP_SRC, srcImage, NULL, dstImage, rect.left, rect.top, 0, 0, rect.left, rect.top, rect.width, rect.height);
-
-                    pixman_image_unref(dstImage);
+                if(firstDraw){
+                    rotatePixelsDirect((uint32_t*)canvasimg->get_data(), (uint32_t*)mBitmapData, {0, 0, canvasimg->get_width(), canvasimg->get_height()}, {0, 0, logicalWidth, logicalHeight}, rotation);
                     isNeedGauss = true;
+                }else{
+                    // 判断是否重叠
+                    if(mDrawRegion.contains(rect)){
+                        rect.intersect(mDrawRegion);
+                        rotatePixelsDirect((uint32_t*)canvasimg->get_data(), (uint32_t*)mBitmapData, {0, 0, canvasimg->get_width(), canvasimg->get_height()}, rect, rotation);
+                        isNeedGauss = true;
+                    }
                 }
+                
             }
             canvas.restore();
         } catch (const std::exception& e) {
@@ -430,8 +424,19 @@ void GaussFilterDrawable::draw(Canvas&canvas){
         if(isNeedGauss){
             computeBitmapGasuss();
         }
-        LOGI("Copy dirty and gauss all time = %lld  isNeedGauss = %d",SystemClock::uptimeMillis() - startTime,isNeedGauss);
-        mFirstDraw = true;
+#if 0
+        // 测试查看图
+        static int index = 0;
+        if((index++ % 2) == 0){
+            mBitmap->write_to_png("testBitmap" + std::to_string(index) + ".png");
+            mGaissBitmap->write_to_png("GaussBitmap" + std::to_string(index) + ".png");
+            mDrawBitmap->write_to_png("DrawBitmap" + std::to_string(index) + ".png");
+        }
+        LOGV("Copy dirty and gauss all time = %lld  isNeedGauss = %d  index = %d",SystemClock::uptimeMillis() - startTime,isNeedGauss, index);
+#else
+        LOGV("Copy dirty and gauss all time = %lld  isNeedGauss = %d",SystemClock::uptimeMillis() - startTime,isNeedGauss);
+#endif
+        
     }
     startTime = SystemClock::uptimeMillis();
     // 实现四边圆角（负角度仅个人项目需求：提示框的右下角是反圆角差不多的效果，因此做了个反圆角的判断）
@@ -463,5 +468,5 @@ void GaussFilterDrawable::draw(Canvas&canvas){
     canvas.get_source_for_surface()->set_filter(Cairo::SurfacePattern::Filter::NEAREST);    // 设置刷新模式为 临近插值
     canvas.paint();
     canvas.restore();
-    LOGE("(%d,%d,%d,%d)  get_width = %d drawTime = %lld",mBounds.left,mBounds.top,mBounds.width,mBounds.height,mDrawBitmap->get_width(), SystemClock::uptimeMillis() - startTime);
+    LOGV("(%d,%d,%d,%d)  get_width = %d drawTime = %lld",mBounds.left,mBounds.top,mBounds.width,mBounds.height,mDrawBitmap->get_width(), SystemClock::uptimeMillis() - startTime);
 }

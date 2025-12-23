@@ -102,22 +102,17 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 # endif()
 
 # Gauss相关的库
-# find_package(Pixman)
-if(CDROID_CHIPSET STREQUAL sigma)
-    find_package(OpenMP REQUIRED)
+if(CDROID_CHIPSET STREQUAL x64)
+    set(AVX_SSE -mavx -msse)
+else()
+    find_package(OpenMP)
     if(OpenMP_C_FOUND)
         add_definitions(-DENABLE_OMP=1)
         target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_C)
     endif()
-else()
-    include_directories(./3rdpart/ARM_NEON_2_x86_SSE)
-    set(AVX_SSE -mavx -msse)
 endif()
 
 target_compile_options(${PROJECT_NAME} PRIVATE ${AVX_SSE})
-
-# 增加 3rdpart 的CMAKE 
-add_subdirectory(./3rdpart)
 
 # PAK打包
 CreatePAK(

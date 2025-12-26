@@ -190,13 +190,15 @@ void GaussFilterDrawable::rotatePixelsDirect(uint32_t* srcData, uint32_t* dstDat
         }
     }
 
-    // 创建变换矩阵
-    pixman_transform_t transform;
-    pixman_transform_init_identity(&transform);
-    pixman_transform_multiply(&transform, &translate, &rotate);   
-    
-    // 应用变换矩阵
-    pixman_image_set_transform(srcImage, &transform);
+    if(rotation != Display::ROTATION_0){
+        // 创建变换矩阵
+        pixman_transform_t transform;
+        pixman_transform_init_identity(&transform);
+        pixman_transform_multiply(&transform, &translate, &rotate);   
+        
+        // 应用变换矩阵
+        pixman_image_set_transform(srcImage, &transform);
+    }
     
     // 设置过滤器质量（可选）
     pixman_image_set_filter(srcImage, PIXMAN_FILTER_BILINEAR, nullptr, 0);
@@ -361,21 +363,21 @@ void GaussFilterDrawable::draw(Canvas&canvas){
             }
             canvas.get_matrix(matrix2);  // 获取canvas移动的位置
             canvas.copy_clip_rectangle_list(clip_rects);
-            
+
             for(int i=0;i<clip_rects.size();i++){
                 Cairo::Rectangle r=clip_rects.at(i);
                 Rect rect;
                 switch(rotation){
-                case Display::ROTATION_0:break;
-                case Display::ROTATION_90:
+                case Display::ROTATION_0:{
+                    rect = Rect::Make((int)std::round(r.x), (int)std::round(r.y), (int)r.width, (int)r.height);
+                    break;
+                }case Display::ROTATION_90:{
                     rect = Rect::Make((int)std::round(logicalWidth - (r.y+matrix2.y0 + r.height)), (int)std::round(r.x+matrix2.x0), (int)r.height, (int)r.width);
                     break;
-                case Display::ROTATION_180:
-                    matrix.translate(canvasWidth,canvasHeight);
-                    matrix.scale(-1,-1);
-                    canvas.transform(matrix);
+                }case Display::ROTATION_180:{
+                    rect = Rect::Make((int)std::round(r.x), (int)std::round(r.y), (int)r.width, (int)r.height);
                     break;
-                case Display::ROTATION_270:
+                }case Display::ROTATION_270:
                     rect = Rect::Make((int)std::round(r.y+matrix2.y0), (int)std::round(logicalHeight - (r.x+matrix2.x0+r.width)), (int)r.height,  (int)r.width);
                     break;
                 }

@@ -8,12 +8,14 @@
                 "~/Cdroid/src/*",
                 "~/Cdroid/src/**",
                 "~/vcpkg/packages/**",
-                "~/Cdroid/outX64-Debug/src/gui/*"
+                "~/Cdroid/outX64-Debug/src/gui/*",
+                "~/Cdroid/apps//ciotpack/linux/x86_64/debug/include/*"
+
             ],
             "defines": [
                 "__VSCODE__"
             ],
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "/usr/bin/gcc-11",
             "cStandard": "c17",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-x64"

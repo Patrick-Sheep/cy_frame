@@ -2,7 +2,7 @@
  * @Author: cy
  * @Email: patrickcchan@163.com
  * @Date: 2024-05-22 15:55:26
- * @LastEditTime: 2025-11-27 11:44:52
+ * @LastEditTime: 2026-06-23 16:34:13
  * @FilePath: /cy_frame/src/windows/base.h
  * @Description: 页面基类
  * @BugList:
@@ -11,6 +11,7 @@
  *
 **/
 
+namespace AppRid = cy_frame::R::id;
 
 #ifndef _BASE_H_
 #define _BASE_H_
@@ -138,8 +139,12 @@ protected:
  /// @brief 页面基类
 class PopBase :public PBase {
 public:
+    DECLARE_UIEVENT(void,OnPopNormalListener);
+public:
     PopBase(std::string resource);
     virtual ~PopBase();
+
+    virtual bool needHildPage() { return true; }
 };
 
 /*

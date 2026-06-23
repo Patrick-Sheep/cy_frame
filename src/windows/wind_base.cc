@@ -2,7 +2,7 @@
  * @Author: cy
  * @Email: patrickcchan@163.com
  * @Date: 2024-05-22 14:51:04
- * @LastEditTime: 2025-11-27 14:37:59
+ * @LastEditTime: 2026-06-23 16:34:47
  * @FilePath: /cy_frame/src/windows/wind_base.cc
  * @Description: 窗口类
  * @BugList:
@@ -88,12 +88,12 @@ void BaseWindow::init() {
     if (
         !(mRootView = (ViewGroup*)(LayoutInflater::from(mContext)->inflate("@layout/wind_base", this))) ||
 
-        !(mPageBox = __getgv(mRootView, ViewGroup, cy_frame::R::id::main_box)) ||
-        !(mPopBox = __getgv(mRootView, ViewGroup, cy_frame::R::id::pop_box)) ||
-        !(mLogoForImage = __getgv(mRootView, ImageView, cy_frame::R::id::logo)) ||
-        !(mLogoForVideo = __getgv(mRootView, VideoView, cy_frame::R::id::logo_video)) ||
-        !(mToast = __getgv(mRootView, TextView, cy_frame::R::id::toast)) ||
-        !(mBlackView = __getgv(mRootView, View, cy_frame::R::id::cover))
+        !(mPageBox = __getgv(mRootView, ViewGroup, AppRid::main_box)) ||
+        !(mPopBox = __getgv(mRootView, ViewGroup, AppRid::pop_box)) ||
+        !(mLogoForImage = __getgv(mRootView, ImageView, AppRid::logo)) ||
+        !(mLogoForVideo = __getgv(mRootView, VideoView, AppRid::logo_video)) ||
+        !(mToast = __getgv(mRootView, TextView, AppRid::toast)) ||
+        !(mBlackView = __getgv(mRootView, View, AppRid::cover))
         ) {
         throw std::runtime_error("BaseWindow View Tree Error");
     }
@@ -326,6 +326,7 @@ int8_t BaseWindow::showPop(PopBase* pop, LoadMsgBase* initData) {
     removePop();
     mPop = pop;
     if (mPop) {
+        mPageBox->setVisibility(mPop->needHildPage() ? GONE : VISIBLE);
         mPopBox->setVisibility(VISIBLE);
         mPopBox->addView(mPop->getRootView());
         mPop->callAttach();
@@ -369,6 +370,7 @@ void BaseWindow::removePage() {
 /// @brief 移除弹窗
 void BaseWindow::removePop() {
     if (mPop) {
+        mPageBox->setVisibility(VISIBLE);
         mPopBox->setVisibility(GONE);
         mPop->callDetach();
         mPopBox->removeAllViews();
